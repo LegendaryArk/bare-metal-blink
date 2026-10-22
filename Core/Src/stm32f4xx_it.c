@@ -59,6 +59,7 @@
 /* USER CODE BEGIN EV */
 
 extern volatile uint32_t ms_ticks;
+extern volatile uint8_t btn_state;
 
 /* USER CODE END EV */
 
@@ -201,5 +202,13 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
+
+void EXTI15_10_IRQHandler(void) {
+
+  if (EXTI->PR & (1U << 13)) {
+    EXTI->PR = (1U << 13);
+    btn_state = (btn_state + 1) % 3;
+  }
+}
 
 /* USER CODE END 1 */
