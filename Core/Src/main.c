@@ -1,38 +1,26 @@
 #include "stm32f4xx.h"
 
+volatile uint32_t ms_ticks = 0;
+
+static void delay_ms(uint32_t ms) {
+  uint32_t st = ms_ticks;
+  while ((ms_ticks - st) < ms) {}
+}
+
 int main(void) {
+  SysTick->LOAD = (SystemCoreClock / 1000) - 1;
+  SysTick->VAL = 0;
+  SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+
+  RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+  (void) RCC->AHB1ENR;
+
+  GPIOA->MODER |= (1U << (5 * 2));
+  
   while (1) {
-
+    GPIOA->BSRR |= (1U << 5);
+    delay_ms(1000);
+    GPIOA->BSRR |= (1U << (5 + 16));
+    delay_ms(500);
   }
 }
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-#ifdef USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
