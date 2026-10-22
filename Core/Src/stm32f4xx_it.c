@@ -204,10 +204,14 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 
 void EXTI15_10_IRQHandler(void) {
+  static uint32_t prev_time = 0;
 
   if (EXTI->PR & (1U << 13)) {
     EXTI->PR = (1U << 13);
-    btn_state = (btn_state + 1) % 3;
+    if (ms_ticks - prev_time > 50) {
+      prev_time = ms_ticks;
+      btn_state = (btn_state + 1) % 3;
+    }
   }
 }
 
